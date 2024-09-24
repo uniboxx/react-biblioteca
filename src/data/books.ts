@@ -6,7 +6,7 @@ export type BookType = {
   rating: number;
 };
 
-const books: Array<BookType> = [
+const books: BookType[] = [
   {
     id: 1,
     title: 'JavaScript—The Comprehensive Guide',

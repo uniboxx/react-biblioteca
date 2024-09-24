@@ -7,10 +7,10 @@ type Props = {
     id: number;
     rating: number;
   };
-  onRate: (id: number, rating: number) => void;
+  // onRate: (id: number, rating: number) => void;
 };
 
-function Rating({ item, onRate }: Props) {
+function Rating({ item }: Props) {
   const ratings: ReactElement[] = [];
 
   Array.from(new Array(5)).forEach((_, i) => {
@@ -19,9 +19,10 @@ function Rating({ item, onRate }: Props) {
       <button
         className={classes.ratingButton}
         key={j}
-        onClick={() => onRate(item.id, j)}
+        // onClick={() => onRate(item.id, j)}
+        data-value={j}
       >
-        {item.rating < j ? <StarBorder /> : <Star />}
+        {j > item.rating ? <StarBorder /> : <Star />}
       </button>
     );
   });
