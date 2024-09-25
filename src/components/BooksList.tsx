@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { books } from '../data/data';
+// import { books } from '../data/data';
 import { useEffect, useMemo, useReducer } from 'react';
 import { StarBorder, Star } from '@mui/icons-material';
 import axios from 'axios';
@@ -8,20 +8,18 @@ const client = axios.create({
   baseURL: import.meta.env.VITE_API_SERVER,
 });
 
-type BooksType = BookType[];
-type Dispatch = (action: BookAction) => void;
-
-interface BookType {
-  id: number;
-  rating: number;
+type Rating = { id: number; rating: number };
+interface BookType extends Rating {
   title: string;
   author: string;
   isbn: string;
 }
+type BooksType = BookType[];
+type Dispatch = (action: BookAction) => void;
 
 type BookAction = {
   type: string;
-  payload: BooksType;
+  payload?: BooksType | Rating;
 };
 
 function middleware(dispatch: Dispatch) {
@@ -32,27 +30,26 @@ function middleware(dispatch: Dispatch) {
         dispatch({ type: 'LOAD_SUCCESS', payload: data });
         break;
       case 'RATE':
-        console.log(action.payload);
-        await client.patch(`/books/${action.payload.id}`, action.payload);
+        await client.patch(`/books/${action.payload?.id}`, action.payload);
         dispatch({
           type: 'RATE_SUCCESS',
-          payload: { id: action.payload.id, rating: action.payload.rating },
+          payload: { id: action.payload?.id, rating: action.payload?.rating },
         });
         break;
     }
   };
 }
 
-function reducer(state, action) {
+function reducer(state: BooksType, action: BookAction) {
   switch (action.type) {
     case 'LOAD_SUCCESS':
       return action.payload;
     case 'RATE_SUCCESS':
       return produce(state, (draftState) => {
         const index = draftState.findIndex(
-          (book) => book.id === action.payload.id
+          (book) => book.id === action.payload?.id
         );
-        draftState[index].rating = action.payload.rating;
+        draftState[index].rating = action.payload?.rating;
       });
     default:
       return state;
@@ -81,7 +78,7 @@ function BooksList() {
         </thead>
         <tbody>
           {books &&
-            books?.map((book) => (
+            books?.map((book: BookType) => (
               <tr key={book.id}>
                 <td>{book.title}</td>
                 <td>{book.author}</td>
